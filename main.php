@@ -8,6 +8,6 @@ $c
         return $e ** 2;
     })
     ->forEach(function ($e, $i, $list) {
-        echo $i . '/' . $list->size() . ' => ' . $e;
+        echo ($i + 1) . '/' . $list->size() . ' => ' . $e . PHP_EOL;
     })
 ;

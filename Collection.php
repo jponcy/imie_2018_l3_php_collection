@@ -1,28 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This class provides some stuff to use functional method on array with easy syntax.
  */
 class Collection {
+    /** * @param array|mixed[] $elements The stored elements. */
+    private $elements = [];
 
     /** Easy way to build a collection. */
     public static function build(... $elements): Collection {
-        return new Collection;
+        /*
+        $result = new Collection;
+
+        foreach ($elements as $elt) {
+            $result->add($elt);
+        }
+
+        return $result;
+        */
+        return new Collection($elements);
+    }
+
+    /** Default Constructor. */
+    public function __construct(array $list = null) {
+        if ($list !== null) {
+            $this->elements = $list;
+        }
     }
 
     /** Stores the given element into collection. */
     public function add($element): Collection {
+        $this->elements[] = $element;
+
         return $this;
     }
 
     /** Gets the nth ($i) element from store. */
     public function get(int $index) {
-        return null;
+        return $this->elements[$index] ?? null;
     }
 
     /** Gets the number of stored element. */
     public function size(): int {
-        return 0;
+        return count($this->elements);
     }
 
     /**
@@ -34,6 +56,21 @@ class Collection {
      * - the complete collection
      */
     public function forEach(closure $function): Collection {
+        /*
+        $i = 0;
+        $list = $this;
+
+        array_walk($this->elements, function ($elt) use($function, $list) {
+            $function($elt, $i ++, $list);
+        });
+        */
+
+        // -----
+
+        foreach ($this->elements as $i => $elt) {
+            $function($elt, $i, $this);
+        }
+
         return $this;
     }
 
@@ -46,7 +83,35 @@ class Collection {
      * - the complete collection
      */
     public function map(closure $function): Collection {
-        return $this;
+        /*
+        // With foreach.
+        $result = new Collection;
+
+        foreach ($this->elements as $i => $elt) {
+            $result->add($function($elt, $i, $this));
+        }
+
+        return $result;
+        */
+
+        // With our forEach.
+        $result = new Collection;
+
+        $this->forEach(function ($elt, $i, $list) use($function, $result) {
+            $result->add($function($elt, $i, $list));
+        });
+
+        return $result;
+
+        /*
+        // With array_map.
+        $i = 0;
+        $list = $this;
+
+        return array_map(function ($elt) use($i, $function, $list) {
+            return $function($elt, $i ++, $list);
+        });
+        */
     }
 
     /**
@@ -69,7 +134,7 @@ class Collection {
      * - the loop index
      * - the complete collection
      */
-    public function find(closure $function): Collection {
+    public function find(closure $function) {
         return $this;
     }
 
