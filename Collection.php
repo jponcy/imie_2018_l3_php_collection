@@ -123,7 +123,15 @@ class Collection {
      * - the complete collection
      */
     public function filter(closure $function): Collection {
-        return $this;
+        $result = new Collection;
+
+        $this->forEach(function ($elt, $i, $list) use($function, $result) {
+            if ($function($elt, $i, $list)) {
+                $result->add($elt);
+            }
+        });
+
+        return $result;
     }
 
     /**
@@ -135,7 +143,13 @@ class Collection {
      * - the complete collection
      */
     public function find(closure $function) {
-        return $this;
+        foreach ($this->elements as $i => $elt) {
+            if ($function($elt, $i, $this)) {
+                return $elt;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -147,7 +161,23 @@ class Collection {
      * - the loop index
      * - the complete collection
      */
-    public function reduce(closure $function): Collection {
-        return $this;
+    public function reduce(closure $function, $default = null) {
+        if ($this->size() === 0) {
+            return $default;
+        }
+
+        if ($default === null) {
+            $result = $this->get(0);
+            $start = 1;
+        } else {
+            $result = $default;
+            $start = 0;
+        }
+
+        for ($i = $start; $i < $this->size(); ++ $i) {
+            $result = $function($this->get($i), $result, $i, $this);
+        }
+
+        return $result;
     }
 }

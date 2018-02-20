@@ -100,13 +100,20 @@ final class CollectionTest extends TestCase {
     }
 
     public function testReduce() {
+        // 1 + 2 + 3 => 6
         $this->assertEquals(6, $this->cp->reduce(function ($elt, $acc) {
             return $elt + $acc;
         }));
 
+        // 1 * 2 * 3 => 6
         $this->assertEquals(6, $this->cp->reduce(function ($elt, $acc) {
             return $elt * $acc;
         }));
+
+        // (1 * 0) + (2 * 1) + (3 * 2) => 0 + 2 + 6 => 8
+        $this->assertEquals(8, $this->cp->reduce(function ($elt, $acc, $i) {
+            return $acc + ($elt * $i);
+        }, 0));
     }
 
     public function testFact() {
@@ -119,11 +126,14 @@ final class CollectionTest extends TestCase {
 
             return $c->reduce(function ($elt, $acc) {
                 return ($elt ?? 1) * $acc;
-            });
+            }) ?? 1;
         };
 
         $this->assertEquals(1, $fact(0));
         $this->assertEquals(1, $fact(1));
-        $this->assertEquals(10, $fact(3628800));
+        $this->assertEquals(2, $fact(2));
+        $this->assertEquals(6, $fact(3));
+        $this->assertEquals(24, $fact(4));
+        $this->assertEquals(3628800, $fact(10));
     }
 }
